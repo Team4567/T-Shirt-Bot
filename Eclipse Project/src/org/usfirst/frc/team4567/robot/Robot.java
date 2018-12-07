@@ -22,11 +22,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.vision.VisionThread;
-import org.usfirst.frc.team4567.grip.GripPipeline;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import org.opencv.core.Rect;
-import org.opencv.imgproc.Imgproc;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -49,8 +45,6 @@ public class Robot extends IterativeRobot {
 	VictorSP LeftP= new VictorSP(1);
 	VictorSP RightP= new VictorSP(0);
 	// Since differential drive only accepts one parameter per side, we have to combine the left and right motors together in groups
-	SpeedControllerGroup L= new SpeedControllerGroup(LeftC,LeftP);
-	SpeedControllerGroup R= new SpeedControllerGroup(RightC,RightP);
 	// DifferentialDrive simplifies joystick control code by using the class FRC gives us.
 	DifferentialDrive roboDrive = new DifferentialDrive(L,R);
 	//Control Devices, set to the order number on the Driver Station. Joysticks are the ones on the xbox controller, left=0 right=1
@@ -58,18 +52,13 @@ public class Robot extends IterativeRobot {
 	Joystick leftStick = new Joystick(0);
 	//Other motor controllers, PWM
 	Spark horn = new Spark(1);
-	Spark shoot= new Spark(0);
+	Spark shootR= new Spark(0);
+	Spark shootL= new Spark(3);
 	// Piston- require 2 ports on the PCM. One is for up, the other down. A piston must be put in the code for power to be sent to the compressor.
 	DoubleSolenoid e = new DoubleSolenoid(0,1);
 	
 	//Misc Variables
 	boolean rev=false;
-	double tPixel;
-	double distance;
-	String dString;
-	private VisionThread visionThread;
-	private double centerX = 0.0;
-	private final Object imgLock = new Object();
 	
     
 
@@ -86,16 +75,7 @@ public class Robot extends IterativeRobot {
 		camera.setResolution(320, 240);
 	    camera.setFPS(30);
 	   
-	    //Implement OpenCV Generated Code to get variables needed
-	    visionThread = new VisionThread(camera, new GripPipeline(), pipeline -> {
-	        if (!pipeline.findContoursOutput().isEmpty()) {
-	            Rect r = Imgproc.boundingRect(pipeline.findContoursOutput().get(0));
-	            synchronized (imgLock) {
-	                centerX = r.x + (r.width / 2);
-	                tPixel=r.width;
-	            }
-	        }
-	    });
+	  
 		
 	}
 
@@ -125,21 +105,6 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		
 		
-		// Find the center of the target, turn robot to target and tell distance to target
-		double centerX;
-	    synchronized (imgLock) {
-	        centerX = this.centerX;
-	        tPixel= this.tPixel;
-	    }
-	    double turn = centerX - (320 / 2);
-	    if(centerX<32 && centerX>-32) {
-	    	roboDrive.arcadeDrive(0, 0);
-	    }else {
-	    roboDrive.arcadeDrive(0, turn * 0.00625);
-	    DriverStation.reportError(dString, false);
-	    distance= ((13/12)*320)/(2*tPixel*Math.tan(Math.toRadians(54.8/2)));
-		dString= String.valueOf(distance) + "feet";
-	}
 	
 	}
 	
@@ -154,16 +119,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		// Vision Testing
-		synchronized (imgLock) {
-	        tPixel= this.tPixel;
-	    }
-		distance= ((13/12)*320)/(2*tPixel*Math.tan(Math.toRadians(54.8/2)));
-		dString= "Distance to Target: " + String.valueOf(distance) + "feet";
 		
-		if(XbC.getBumperPressed(Hand.kLeft)){
-			DriverStation.reportError(dString, false);
-		}
 		//-------------------------------------------------
 		//Joystick control
 		// Rev was in order to have either side of the robot be controlled as the front if we were retrieving or shooting
@@ -190,12 +146,19 @@ public class Robot extends IterativeRobot {
 		// Shooting Mechanism
 		if(XbC.getTriggerAxis(Hand.kRight)>=0.5) {
 			//SHOOT
-			shoot.set(1);
-		} else {shoot.set(1);
+			shootR.set(1);
+		} else {shootR.set(0);
+		}
+		if(XbC.getTriggerAxis(Hand.kLeft)>=0.5) {
+			//SHOOT
+			shootL.set(1);
+		} else {shootL.set(0);
 		}
 		// Best Part of the Robot
 		if(XbC.getXButton()) {
 			//HORN
 			horn.set(1);
-		} else {horn.set(0);}
+		} else {
+			horn.set(0);
+		}
 }}
