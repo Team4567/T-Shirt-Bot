@@ -35,25 +35,34 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  * project.
  */
 public class Robot extends IterativeRobot {
+	/*
+	MOTOR CONTROLLERS
+		LEFTWHEEL-PWM 1
+		RIGHTWEEL-PWM 0
+		HORN- PWM 2
+		RIGHTCANNON- PWM 3
+		LEFTCANNON- PWM 4
+	*/
 	// Defines all motor controllers, pistons, etc.
 	public static final Subsystem m_subsystem = null;
 	//Wheels
-	// TalonSRX uses CAN, not PWM. You need to access the web interface when connected to the robot to set the port number (Left=2, Right=1)
+	/* TalonSRX uses CAN, not PWM. You need to access the web interface when connected to the robot to set the port number (Left=2, Right=1)
 	WPI_TalonSRX LeftC= new WPI_TalonSRX(2);
 	WPI_TalonSRX RightC= new WPI_TalonSRX(1);
+	*/
 	// These PWM Motor controllers just use their port number on the RIO
 	VictorSP LeftP= new VictorSP(1);
 	VictorSP RightP= new VictorSP(0);
 	// Since differential drive only accepts one parameter per side, we have to combine the left and right motors together in groups
 	// DifferentialDrive simplifies joystick control code by using the class FRC gives us.
-	DifferentialDrive roboDrive = new DifferentialDrive(L,R);
+	DifferentialDrive roboDrive = new DifferentialDrive(LeftP,RightP);
 	//Control Devices, set to the order number on the Driver Station. Joysticks are the ones on the xbox controller, left=0 right=1
 	XboxController XbC = new XboxController(0);
 	Joystick leftStick = new Joystick(0);
 	//Other motor controllers, PWM
-	Spark horn = new Spark(1);
-	Spark shootR= new Spark(0);
-	Spark shootL= new Spark(3);
+	Spark horn = new Spark(2);
+	Spark shootR= new Spark(3);
+	Spark shootL= new Spark(4);
 	// Piston- require 2 ports on the PCM. One is for up, the other down. A piston must be put in the code for power to be sent to the compressor.
 	DoubleSolenoid e = new DoubleSolenoid(0,1);
 	
