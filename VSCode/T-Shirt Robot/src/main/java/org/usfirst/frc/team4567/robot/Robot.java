@@ -7,26 +7,18 @@
 //Tells the code where it is, it gets lost easily
 package org.usfirst.frc.team4567.robot;
 
-// Anything you want to add to your robot that needs to be controlled MUST be imported!
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.VictorSP;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -36,13 +28,9 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  */
 public class Robot extends IterativeRobot {
 	/*
-	MOTOR CONTROLLERS
-		LEFTWHEEL-PWM 1
-		RIGHTWEEL-PWM 0
-		HORN- PWM 2
-		RIGHTCANNON- PWM 3
-		LEFTCANNON- PWM 4
-	*/
+	 * MOTOR CONTROLLERS LEFTWHEEL-PWM 1 RIGHTWEEL-PWM 0 HORN- PWM 2 RIGHTCANNON-
+	 * PWM 3 LEFTCANNON- PWM 4
+	 */
 	// Defines all motor controllers, pistons, etc.
 	public static final Subsystem m_subsystem = null;
 	//Wheels

@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package src.main.java.org.usfirst.frc.team4567.robot;
+package org.usfirst.frc.team4567.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -33,7 +33,7 @@ public class Wiimote extends GenericHID {
     kBack(6),
     kStart(5);
 
-    @SuppressWarnings("MemberName")
+//     @SuppressWarnings("MemberName")
     private int value;
 
     Button(int value) {
