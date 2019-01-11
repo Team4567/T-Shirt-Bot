@@ -9,8 +9,10 @@ package org.usfirst.frc.team4567.robot;
 
 // Anything you want to add to your robot that needs to be controlled MUST be imported!
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -27,24 +29,17 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  * project.
  */
 public class Robot extends TimedRobot {
-	/*
-	MOTOR CONTROLLERS
-		LEFTWHEEL-PWM 1
-		RIGHTWEEL-PWM 0
-		HORN- PWM 2
-		RIGHTCANNON- PWM 3
-		LEFTCANNON- PWM 4
-	*/
+	
 	// Defines all motor controllers, pistons, etc.
-	public static final Subsystem m_subsystem = null;
+	
 	//Wheels
 	/* TalonSRX uses CAN, not PWM. You need to access the web interface when connected to the robot to set the port number (Left=2, Right=1)
 	WPI_TalonSRX LeftC= new WPI_TalonSRX(2);
 	WPI_TalonSRX RightC= new WPI_TalonSRX(1);
 	*/
 	// These PWM Motor controllers just use their port number on the RIO
-	VictorSP LeftP= new VictorSP(Constants.LeftP);
-	VictorSP RightP= new VictorSP(Constants.RightP);
+	Talon LeftP= new Talon(Constants.LeftP);
+	Talon RightP= new Talon(Constants.RightP);
 	// Since differential drive only accepts one parameter per side, we have to combine the left and right motors together in groups
 	// DifferentialDrive simplifies joystick control code by using the class FRC gives us.
 	DifferentialDrive roboDrive = new DifferentialDrive(LeftP,RightP);
@@ -52,14 +47,19 @@ public class Robot extends TimedRobot {
 	XboxController XbC = new XboxController(0);
 	Joystick leftStick = new Joystick(0);
 	//Other motor controllers, PWM
-	Spark horn = new Spark(Constants.horn);
-	Spark shootR= new Spark(Constants.RightC);
-	Spark shootL= new Spark(Constants.LeftC);
+	Victor horn = new Victor(Constants.horn);
+	Talon shootR= new Talon(Constants.RightC);
+	Victor shootL= new Victor(Constants.LeftC);
+	Victor lights= new Victor(Constants.lights);
 	// Piston- require 2 ports on the PCM. One is for up, the other down. A piston must be put in the code for power to be sent to the compressor.
 	DoubleSolenoid e = new DoubleSolenoid(0,1);
 	
 	//Misc Variables
 	boolean rev=false;
+	boolean lighter=false;
+	double pulseVal=0;
+	enum lightMode{up,down};
+	lightMode l=lightMode.up;
 	
     
 
@@ -72,10 +72,7 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		// Vision Testing Code
 		// Setup Camera Parameters
-		UsbCamera camera= CameraServer.getInstance().startAutomaticCapture();
-		camera.setResolution(320, 240);
-	    camera.setFPS(30);
-	   
+		
 	  
 		
 	}
@@ -129,9 +126,9 @@ public class Robot extends TimedRobot {
 		}
 
 		if (rev) {
-		    roboDrive.arcadeDrive(leftStick.getY(),-1*leftStick.getX());
+		    roboDrive.arcadeDrive(leftStick.getY(),leftStick.getX());
 		} else {
-		    roboDrive.arcadeDrive(-1*leftStick.getY(),-1*leftStick.getX());
+		    roboDrive.arcadeDrive(-1*leftStick.getY(),leftStick.getX());
 		}
 		//Functions
 		// Cannon Elevation Piston
@@ -161,5 +158,14 @@ public class Robot extends TimedRobot {
 			horn.set(1);
 		} else {
 			horn.set(0);
+		}
+		if(XbC.getBButtonPressed()){
+			lighter=!lighter;
+
+		}
+		if(lighter){
+			lights.set(1);
+		} else{
+			lights.set(0);
 		}
 }}
