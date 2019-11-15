@@ -6,6 +6,6 @@ public class Constants{
     public static final int horn=4;
     public static final int LeftC=5;
     public static final int RightC=3;
-    public static final int lights=6;
 
-}
+
+}  

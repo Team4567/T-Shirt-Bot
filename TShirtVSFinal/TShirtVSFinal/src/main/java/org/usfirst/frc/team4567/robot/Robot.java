@@ -21,6 +21,7 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.Compressor;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -50,12 +51,13 @@ public class Robot extends TimedRobot {
 	Victor horn = new Victor(Constants.horn);
 	Talon shootR= new Talon(Constants.RightC);
 	Victor shootL= new Victor(Constants.LeftC);
-	Victor lights= new Victor(Constants.lights);
+
 	// Piston- require 2 ports on the PCM. One is for up, the other down. A piston must be put in the code for power to be sent to the compressor.
-	DoubleSolenoid e = new DoubleSolenoid(0,1);
+	DoubleSolenoid e = new DoubleSolenoid(5,0,1);
+	Compressor c = new Compressor(5);
 	
 	//Misc Variables
-	boolean rev=false;
+	boolean kid=false;
 	boolean lighter=false;
 	double pulseVal=0;
 	enum lightMode{up,down};
@@ -73,8 +75,8 @@ public class Robot extends TimedRobot {
 		// Vision Testing Code
 		// Setup Camera Parameters
 		
-	  
-		
+		c.setClosedLoopControl(true);
+		c.start();
 	}
 	
 
@@ -123,50 +125,55 @@ public class Robot extends TimedRobot {
 		//Joystick control
 		// Rev was in order to have either side of the robot be controlled as the front if we were retrieving or shooting
 		if (XbC.getStartButtonPressed()) {
-		    rev = !rev;
+			kid = !kid;
+			System.out.println("Kid mode is " + kid);
 		}
 
-		if (rev) {
-		    roboDrive.arcadeDrive(leftStick.getY(),leftStick.getX());
+		if (kid) {
+		    roboDrive.arcadeDrive(-0.5*leftStick.getY(),0.5*leftStick.getX());
 		} else {
-		    roboDrive.arcadeDrive(-1*leftStick.getY(),leftStick.getX());
+		    roboDrive.arcadeDrive(-leftStick.getY(),leftStick.getX());
 		}
 		//Functions
 		// Cannon Elevation Piston
-		if(XbC.getAButton()){
-			//DOWN
-			e.set(DoubleSolenoid.Value.kReverse);
-		} else if(XbC.getYButton()){
-			//UP
-			e.set(DoubleSolenoid.Value.kForward);
-		} else {
-			e.set(DoubleSolenoid.Value.kOff);
+		if(!kid){
+			if(XbC.getAButton()){
+				//DOWN
+				e.set(DoubleSolenoid.Value.kReverse);
+			} else if(XbC.getYButton()){
+				//UP
+				e.set(DoubleSolenoid.Value.kForward);
+			} else {
+				e.set(DoubleSolenoid.Value.kOff);
+			}
+			// Shooting Mechanism
+			if(XbC.getTriggerAxis(Hand.kRight)>=0.5) {
+				//SHOOT
+				shootR.set(1);
+			} else {
+				shootR.set(0);
+			}
+			if(XbC.getTriggerAxis(Hand.kLeft)>=0.5) {
+				//SHOOT
+				shootL.set(1);
+			} else {
+				shootL.set(0);
+			}
+			// Best Part of the Robot
+			
+			if(XbC.getBButtonPressed()){
+				lighter=!lighter;
+			}
 		}
-		// Shooting Mechanism
-		if(XbC.getTriggerAxis(Hand.kRight)>=0.5) {
-			//SHOOT
-			shootR.set(1);
-		} else {shootR.set(0);
-		}
-		if(XbC.getTriggerAxis(Hand.kLeft)>=0.5) {
-			//SHOOT
-			shootL.set(1);
-		} else {shootL.set(0);
-		}
-		// Best Part of the Robot
 		if(XbC.getXButton()) {
 			//HORN
-			horn.set(1);
+			if(kid){
+				horn.set(0.5);
+			}else{
+				horn.set(1);
+			}
 		} else {
 			horn.set(0);
 		}
-		if(XbC.getBButtonPressed()){
-			lighter=!lighter;
-
-		}
-		if(lighter){
-			lights.set(1);
-		} else{
-			lights.set(0);
-		}
-}}
+	}
+}
